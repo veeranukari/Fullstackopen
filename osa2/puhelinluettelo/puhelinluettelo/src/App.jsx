@@ -1,44 +1,61 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import personService from "./services/persons";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
-
-  const baseUrl = "http://localhost:3001/persons";
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
-    axios.get(baseUrl).then(response => {
+    personService.getAll().then(response => {
       setPersons(response.data);
     });
   }, []);
 
+  const showMessage = (message) => {
+    setNotification(message);
+    
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
+  }
+
   const addPerson = (event) => {
     event.preventDefault();
-
-    if (persons.some(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
-      return;
-    }
 
     const personObject = {
       name: newName,
       number: newNumber,
     };
 
-    axios.post(baseUrl, personObject).then(response => {
+    personService.create(personObject).then(response => {
       setPersons(persons.concat(response.data));
+      showMessage(`Added ${response.data.name}`);
       setNewName("");
       setNewNumber("");
+    });
+  };
+
+  const deletePerson = (id, name) => {
+    const confirm = window.confirm(`Delete ${name}?`);
+
+    if (!confirm) return;
+
+    personService.remove(id).then(() => {
+      setPersons(persons.filter(person => person.id !== id));
+
+      showMessage(`Deleted ${name}`);
     });
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
 
       <PersonForm
         addPerson={addPerson}
@@ -50,7 +67,7 @@ const App = () => {
 
       <h2>Numbers</h2>
 
-      <Persons persons={persons} />
+      <Persons persons={persons} deletePerson={deletePerson} />
     </div>
   );
 };
