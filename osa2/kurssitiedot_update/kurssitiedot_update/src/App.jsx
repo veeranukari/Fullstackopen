@@ -29,6 +29,16 @@ const Total = ({ course }) => {
   return <p>Number of exercises {total}</p>
 }
 
+const Course = ({ course }) => {
+  return (
+    <div>
+      <Header course={course} />
+      <Content course={course} />
+      <Total course={course} />
+    </div>
+  )
+}
+
 const App = () => {
   const course = {
     name: 'Half Stack application development',
