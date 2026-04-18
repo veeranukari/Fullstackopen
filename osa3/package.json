@@ -1,0 +1,26 @@
+{
+  "name": "notebackend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/veeranukari/Fullstackopen.git"
+  },
+  "keywords": [
+    "osa3"
+  ],
+  "author": "Veera Nukari",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/veeranukari/Fullstackopen/issues"
+  },
+  "homepage": "https://github.com/veeranukari/Fullstackopen#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
