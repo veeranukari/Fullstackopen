@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = "/api/persons";
+const baseUrl = "https://fullstackopen-coh5.onrender.com/api/persons";
 
 const getAll = () => {
   return axios.get(baseUrl);
