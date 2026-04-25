@@ -3,7 +3,6 @@ const cors = require("cors");
 const morgan = require("morgan");
 const app = express();
 
-const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
@@ -42,10 +41,6 @@ app.get("/info", (req, res) => {
       <p>${now}</p>
     </div>
   `);
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
 });
 
 app.delete('/api/persons/:id', (request, response) => {
