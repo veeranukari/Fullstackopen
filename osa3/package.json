@@ -22,6 +22,7 @@
   "homepage": "https://github.com/veeranukari/Fullstackopen#readme",
   "dependencies": {
     "cors": "^2.8.6",
+    "dotenv": "^16.0.3",
     "express": "^5.2.1",
     "mongoose": "^9.5.0",
     "morgan": "^1.10.1"
