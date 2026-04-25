@@ -37,6 +37,9 @@ const App = () => {
       showMessage(`Added ${response.data.name}`);
       setNewName("");
       setNewNumber("");
+    })
+    .catch(error => {
+      showMessage(error.response.data.error);
     });
   };
 

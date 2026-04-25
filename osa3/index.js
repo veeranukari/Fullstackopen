@@ -1,5 +1,8 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
+app.use(cors());
+app.use(express.json());
 
 const PORT = 3001;
 
@@ -10,7 +13,6 @@ let persons = [
   { id: 4, name: "Mary Poppendieck", number: "39-23-6423122" }
 ];
 
-app.use(express.json());
 
 app.get("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
@@ -63,7 +65,7 @@ app.post('/api/persons', (req, res) => {
   const nameExists = persons.some(person => person.name === body.name)
 
   if (nameExists) {
-    return re.status(400).json({
+    return res.status(400).json({
       error: 'name must be unique'
     })
   }
