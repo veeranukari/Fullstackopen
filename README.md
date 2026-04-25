@@ -14,3 +14,6 @@ osa2
 ```
 
 Hakemistoon kannattaa sijoittaa koko tehtäväsarjan react-projekti lukuunottamatta riippuvuuksia sisältävää hakemistoa <i>node\_modules</i>
+
+
+Tehtävä 3.10 testaus https://fullstackopen-coh5.onrender.com/
