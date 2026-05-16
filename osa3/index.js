@@ -11,7 +11,7 @@ app.use(morgan("tiny"));
 app.use(express.static('dist'))
 
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
   Person.findById(req.params.id).then(person => {
     if (person) {
       res.json(person)
@@ -19,6 +19,7 @@ app.get("/api/persons/:id", (req, res) => {
       res.status(404).end()
     }
   })
+  .catch(error => next(error))
 });
 
 app.get("/api/persons", (req, res) => {
@@ -39,13 +40,14 @@ app.get("/info", (req, res) => {
   })
 });
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id).then(() => {
     response.status(204).end()
   })
+  .catch(error => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body
 
   if (!body.name || !body.number) {
@@ -69,8 +71,25 @@ app.post('/api/persons', (req, res) => {
     person.save().then(savedPerson => {
       res.json(savedPerson)
     })
+    .catch(error => next(error))
   })
 })
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT ||3001;
 app.listen(PORT, () => {
