@@ -2,6 +2,7 @@ const { test, beforeEach, after, describe } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const bcrypt = require('bcrypt')
 const app = require('../app')
 const Blog = require('../models/blog')
 const User = require('../models/user')
@@ -23,15 +24,27 @@ const initialBlogs = [
   },
 ]
 
+const loginAsRoot = async () => {
+  const response = await api
+    .post('/api/login')
+    .send({
+      username: 'root',
+      password: 'sekret',
+    })
+
+  return response.body.token
+}
+
 describe('blogs api', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
     await User.deleteMany({})
 
+    const passwordHash = await bcrypt.hash('sekret', 10)
     const user = new User({
       username: 'root',
       name: 'Superuser',
-      passwordHash: 'passwordHash',
+      passwordHash,
     })
 
     const savedUser = await user.save()
@@ -73,6 +86,7 @@ describe('blogs api', () => {
   })
 
   test('a valid blog can be added', async () => {
+    const token = await loginAsRoot()
     const newBlog = {
       title: 'Async await cleans up promise code',
       author: 'Test Writer',
@@ -82,6 +96,7 @@ describe('blogs api', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -92,6 +107,26 @@ describe('blogs api', () => {
     assert.strictEqual(response.body.length, initialBlogs.length + 1)
     assert(titles.includes('Async await cleans up promise code'))
     assert(response.body.find((blog) => blog.title === newBlog.title).user)
+  })
+
+  test('adding a blog fails with status 401 if token is not provided', async () => {
+    const newBlog = {
+      title: 'No token, no blog',
+      author: 'Test Writer',
+      url: 'https://fullstackopen.com/',
+      likes: 1,
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+
+    const response = await api.get('/api/blogs')
+    const titles = response.body.map((blog) => blog.title)
+
+    assert.strictEqual(response.body.length, initialBlogs.length)
+    assert(!titles.includes(newBlog.title))
   })
 
   test('a blog can be deleted', async () => {
