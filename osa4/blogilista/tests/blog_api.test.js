@@ -47,6 +47,27 @@ describe('blogs api', () => {
     assert(response.body[0].id)
     assert.strictEqual(response.body[0]._id, undefined)
   })
+
+  test('a valid blog can be added', async () => {
+    const newBlog = {
+      title: 'Async await cleans up promise code',
+      author: 'Test Writer',
+      url: 'https://fullstackopen.com/',
+      likes: 3,
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    const titles = response.body.map((blog) => blog.title)
+
+    assert.strictEqual(response.body.length, initialBlogs.length + 1)
+    assert(titles.includes('Async await cleans up promise code'))
+  })
 })
 
 after(async () => {
