@@ -40,6 +40,10 @@ const App = () => {
     })
     .catch(error => {
       showMessage(error.response.data.error);
+
+      setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
     });
   };
 
