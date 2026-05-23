@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
@@ -25,7 +26,23 @@ const initialBlogs = [
 describe('blogs api', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
-    await Blog.insertMany(initialBlogs)
+    await User.deleteMany({})
+
+    const user = new User({
+      username: 'root',
+      name: 'Superuser',
+      passwordHash: 'passwordHash',
+    })
+
+    const savedUser = await user.save()
+    const blogs = initialBlogs.map((blog) => ({
+      ...blog,
+      user: savedUser._id,
+    }))
+    const savedBlogs = await Blog.insertMany(blogs)
+
+    savedUser.blogs = savedBlogs.map((blog) => blog._id)
+    await savedUser.save()
   })
 
   test('blogs are returned as json', async () => {
@@ -48,6 +65,13 @@ describe('blogs api', () => {
     assert.strictEqual(response.body[0]._id, undefined)
   })
 
+  test('blogs include information about the user who added them', async () => {
+    const response = await api.get('/api/blogs')
+
+    assert.strictEqual(response.body[0].user.username, 'root')
+    assert.strictEqual(response.body[0].user.name, 'Superuser')
+  })
+
   test('a valid blog can be added', async () => {
     const newBlog = {
       title: 'Async await cleans up promise code',
@@ -67,6 +91,7 @@ describe('blogs api', () => {
 
     assert.strictEqual(response.body.length, initialBlogs.length + 1)
     assert(titles.includes('Async await cleans up promise code'))
+    assert(response.body.find((blog) => blog.title === newBlog.title).user)
   })
 
   test('a blog can be deleted', async () => {

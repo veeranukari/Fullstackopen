@@ -5,12 +5,14 @@ const supertest = require('supertest')
 const bcrypt = require('bcrypt')
 const app = require('../app')
 const User = require('../models/user')
+const Blog = require('../models/blog')
 
 const api = supertest(app)
 
 describe('users api', () => {
   beforeEach(async () => {
     await User.deleteMany({})
+    await Blog.deleteMany({})
 
     const passwordHash = await bcrypt.hash('sekret', 10)
     const user = new User({
@@ -19,7 +21,18 @@ describe('users api', () => {
       passwordHash,
     })
 
-    await user.save()
+    const savedUser = await user.save()
+    const blog = new Blog({
+      title: 'Root user blog',
+      author: 'Superuser',
+      url: 'https://fullstackopen.com/',
+      likes: 1,
+      user: savedUser._id,
+    })
+    const savedBlog = await blog.save()
+
+    savedUser.blogs = savedUser.blogs.concat(savedBlog._id)
+    await savedUser.save()
   })
 
   test('users are returned as json', async () => {
@@ -57,6 +70,13 @@ describe('users api', () => {
     const response = await api.get('/api/users')
 
     assert.strictEqual(response.body[0].passwordHash, undefined)
+  })
+
+  test('users include blogs added by them', async () => {
+    const response = await api.get('/api/users')
+
+    assert.strictEqual(response.body[0].blogs.length, 1)
+    assert.strictEqual(response.body[0].blogs[0].title, 'Root user blog')
   })
 })
 
