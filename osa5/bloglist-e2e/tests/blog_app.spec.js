@@ -24,8 +24,8 @@ describe('Blog app', () => {
 
     const userResponse = await request.post(`${apiUrl}/users`, {
       data: {
-        name: 'Matti Luukkainen',
-        username: 'mluukkai',
+        name: 'Vilijonkka',
+        username: 'vipsu',
         password: 'salainen'
       }
     })
@@ -36,22 +36,22 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
-      await loginWith(page, 'mluukkai', 'salainen')
+      await loginWith(page, 'vipsu', 'salainen')
 
-      await expect(page.getByText('Matti Luukkainen logged in')).toBeVisible()
+      await expect(page.getByText('Vilijonkka logged in')).toBeVisible()
     })
 
     test('fails with wrong credentials', async ({ page }) => {
-      await loginWith(page, 'mluukkai', 'wrong-password')
+      await loginWith(page, 'vipsu', 'wrong-password')
 
       await expect(page.getByText('wrong username/password')).toBeVisible()
-      await expect(page.getByText('Matti Luukkainen logged in')).not.toBeVisible()
+      await expect(page.getByText('Vilijonkka logged in')).not.toBeVisible()
     })
   })
 
   describe('When logged in', () => {
     beforeEach(async ({ page }) => {
-      await loginWith(page, 'mluukkai', 'salainen')
+      await loginWith(page, 'vipsu', 'salainen')
     })
 
     test('a new blog can be created', async ({ page }) => {
@@ -60,21 +60,21 @@ describe('Blog app', () => {
       await createBlog(
         page,
         title,
-        'Matti Luukkainen',
+        'Vilijonkka',
         'https://fullstackopen.com/'
       )
 
       await expect(page.locator('.blog').filter({
-        hasText: `${title} Matti Luukkainen`
+        hasText: `${title} Vilijonkka`
       }).first()).toBeVisible()
     })
 
     test('a blog can be liked', async ({ page }) => {
       const title = `Likeable blog ${Date.now()}`
 
-      await createBlog(page, title, 'Matti Luukkainen', 'https://example.com/likeable')
+      await createBlog(page, title, 'Vilijonkka', 'https://example.com/likeable')
 
-      await page.getByRole('link', { name: `${title} Matti Luukkainen` }).click()
+      await page.getByRole('link', { name: `${title} Vilijonkka` }).click()
       await expect(page.locator('.blog')).toContainText('likes 0')
       await page.getByRole('button', { name: 'like' }).click()
 
@@ -84,13 +84,13 @@ describe('Blog app', () => {
     test('the user who created a blog can delete it', async ({ page }) => {
       const title = `Disposable blog ${Date.now()}`
 
-      await createBlog(page, title, 'Matti Luukkainen', 'https://example.com/disposable')
+      await createBlog(page, title, 'Vilijonkka', 'https://example.com/disposable')
 
-      await page.getByRole('link', { name: `${title} Matti Luukkainen` }).click()
+      await page.getByRole('link', { name: `${title} Vilijonkka` }).click()
       page.once('dialog', dialog => dialog.accept())
       await page.getByRole('button', { name: 'delete' }).click()
 
-      await expect(page.locator('.blog').filter({ hasText: `${title} Matti Luukkainen` })).not.toBeVisible()
+      await expect(page.locator('.blog').filter({ hasText: `${title} Vilijonkka` })).not.toBeVisible()
     })
   })
 })

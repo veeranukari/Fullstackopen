@@ -4,12 +4,12 @@ import Blog from './Blog'
 
 const blog = {
   title: 'Component testing is done with react-testing-library',
-  author: 'Matti Luukkainen',
+  author: 'Vilijonkka',
   url: 'https://fullstackopen.com/',
   likes: 7,
   user: {
-    username: 'mluukkai',
-    name: 'Matti Luukkainen'
+    username: 'vipsu',
+    name: 'Vilijonkka'
   }
 }
 
@@ -51,7 +51,7 @@ test('renders delete button for the user who created the blog', () => {
       blog={blog}
       updateBlog={() => {}}
       removeBlog={() => {}}
-      loggedUser={{ username: 'mluukkai', name: 'Matti Luukkainen' }}
+      loggedUser={{ username: 'vipsu', name: 'Vilijonkka' }}
     />
   )
 
